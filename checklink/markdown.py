@@ -6,7 +6,7 @@ from pathlib import Path
 
 import requests as r
 
-from .re_ import MD_LINK, removeAnchor, HTTP_URL
+from .re_ import MD_LINK, removeAnchor, HTTP_URL, PATH
 from .formatter_ import MessageFormatter
 
 class MarkdownFinder:
@@ -37,13 +37,15 @@ class MarkdownFinder:
                     self.testLink(match.group("url"), path, i)
 
     def testLink(self, link_url, file_path, line_num):
-        x = HTTP_URL.match(link_url)
-        if not x is None:   # 网络地址
+        if HTTP_URL.match(link_url):   # 网络地址
+            x = HTTP_URL.match(link_url)
             url = removeAnchor(x)
             response = r.get(url)
             if response.status_code != 200:
                 self._formatter(file_path.absolute(), line_num, link_url)
-        else: # 本地路径
+        elif PATH.match(link_url):# 本地路径
+            x = PATH.match(link_url)
+            link_url = x.group('path')
             if link_url[0] == '/':
                 x = Path(link_url[1:])
                 path = self._root / x
@@ -53,6 +55,8 @@ class MarkdownFinder:
             if not path.exists():
                 self._formatter(file_path.absolute(),
                 line_num, link_url)
+        else:
+            self._formatter(file_path.absolute(), line_num, link_url[:20])
 
     def run(self):
         self.walk(self._root)

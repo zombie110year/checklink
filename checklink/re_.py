@@ -8,6 +8,11 @@ HTTP_URL = re.compile(
     r"(?P<protocol>https?://)(?P<domain>([^/\s]+))(?P<path>(/[^#/\s]*)+/?)?(?P<anchor>(#\S*))?"
 )
 
+PATH = re.compile(
+    r"(?P<path>(/?[^/:*?\"<>|\\])+)"
+    # \/:*?"<>|
+)
+
 
 def removeAnchor(match):
     """传入 HTTP_URL 的 Match 实例, 去除 anchor.

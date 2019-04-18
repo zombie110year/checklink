@@ -1,6 +1,6 @@
 import unittest as t
 
-from checklink.re_ import HTTP_URL, MD_LINK
+from checklink.re_ import HTTP_URL, MD_LINK, PATH
 
 markdown_link = [
     "[title](https://github.com)",
@@ -52,6 +52,14 @@ http_answer = [
 ]
 
 
+path_list = [
+    "/home/zombie110year/hello",
+    "tests/__init__.py",
+    "../example",
+    "./.gitignore",
+    ".gitignore",
+]
+
 class TestRe_(t.TestCase):
     def setUp(self):
         pass
@@ -83,3 +91,8 @@ class TestRe_(t.TestCase):
             self.assertEqual(
                 x.group('anchor'), a[3], msg=q
             )
+
+    def test_path(self):
+        for q in path_list:
+            x = PATH.match(q)
+            self.assertEqual(x.group('path'), q)
