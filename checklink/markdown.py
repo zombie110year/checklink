@@ -40,8 +40,14 @@ class MarkdownFinder:
         if HTTP_URL.match(link_url):   # 网络地址
             x = HTTP_URL.match(link_url)
             url = removeAnchor(x)
-            response = r.get(url)
-            if response.status_code != 200:
+
+            try:
+                response = r.get(url)
+            except r.ConnectionError:
+                self._formatter(file_path.absolute(), line_num, link_url)
+                return
+
+            if response.status_code in [403, 404, 408]: # 出问题了
                 self._formatter(file_path.absolute(), line_num, link_url)
         elif PATH.match(link_url):# 本地路径
             x = PATH.match(link_url)

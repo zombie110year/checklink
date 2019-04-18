@@ -8,7 +8,7 @@ EMAIL = "zombie110year@outlook.com"
 URL = "https://github.com/zombie110year/"
 
 # * 版本号
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 
 # * 短描述
 DESCRIPTION = "check link under a dir which contain markdown or <del>rst</del> file."
