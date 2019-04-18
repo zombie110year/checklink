@@ -1,15 +1,15 @@
 import re
 
 MD_LINK = re.compile(
-    r"!?\[.*?\]\((?P<url>\S+)\)"
+    r"!?\[(.*)?\]\((?P<url>\S+)?\)"
 )
 
 HTTP_URL = re.compile(
-    r"(?P<protocol>https?://)(?P<domain>([^/\s]+))(?P<path>(/[^#/\s]*)+/?)?(?P<anchor>(#\S*))?"
+    r"^(?P<protocol>https?://)(?P<domain>([^/\s]+))(?P<path>(/[^#/\s]*)+/?)?(?P<anchor>(#\S*))?$"
 )
 
 PATH = re.compile(
-    r"(?P<path>(/?[^/:*?\"<>|\\])+)"
+    r"^(?P<path>(/?[^/:*?\"<>|\\])+)$"
     # \/:*?"<>|
 )
 

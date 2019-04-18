@@ -60,6 +60,32 @@ path_list = [
     ".gitignore",
 ]
 
+path_list_error = [
+    "mailto:zombie110year@outlook.com",
+    "data:image/png,base64,jfkdajkfjkaslf;jadf",
+]
+
+path_ans = [
+    "/home/zombie110year/hello",
+    "tests/__init__.py",
+    "../example",
+    "./.gitignore",
+    ".gitignore",
+]
+
+markdown_special_ans = [
+    "/__init__.py",
+    "mailto:zombie110year@outlook.com",
+    "data:image/png;base64,ILENFLKSNGEJ",
+    "#这是一个测试用文件",
+    None,
+    None,
+    "https://github.com/",
+    "__init__.py",
+    "/__init__.py",
+    "__main__.py",
+]
+
 class TestRe_(t.TestCase):
     def setUp(self):
         pass
@@ -93,6 +119,24 @@ class TestRe_(t.TestCase):
             )
 
     def test_path(self):
-        for q in path_list:
+        for q, a in list(zip(path_list, path_ans)):
             x = PATH.match(q)
-            self.assertEqual(x.group('path'), q)
+            self.assertEqual(x.group('path'), a)
+
+        for q in path_list_error:
+            x = PATH.match(q)
+            self.assertEqual(x, None)
+
+
+    def test_markdown_special(self):
+        stack = []
+        with open("tests/test_markdown.md", "rt", encoding="utf-8") as file:
+            content = file.readlines()
+
+        for line in content:
+            x = MD_LINK.match(line)
+            if x:
+                stack.append(x.group('url'))
+
+        for i, j in list(zip(stack, markdown_special_ans)):
+            self.assertEqual(i, j)

@@ -14,9 +14,7 @@ class MarkdownFinder:
     def __init__(self, root):
         self._suffix = {".md", ".MD", ".markdown"}
         self._formatter = MessageFormatter("{}:{} {}")
-        self._pattern = re.compile(
-            r"!?\[.*?\]\((?P<url>\S+)\)"
-        )
+        self._pattern = MD_LINK
         self._root = Path(root).absolute()
 
     def walk(self, root_dir: Path):
@@ -34,7 +32,11 @@ class MarkdownFinder:
                 i += 1
                 match = self._pattern.match(line)
                 if not match is None:
-                    self.testLink(match.group("url"), path, i)
+                    url = match.groupdict()['url']
+                    if not url is None:
+                        self.testLink(match.group("url"), path, i)
+                    else:
+                        self._formatter(path, i, "None")
 
     def testLink(self, link_url, file_path, line_num):
         if HTTP_URL.match(link_url):   # 网络地址
