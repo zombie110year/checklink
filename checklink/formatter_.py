@@ -4,6 +4,4 @@ class MessageFormatter:
         self.__temp = temp
 
     def __call__(self, *args):
-        print(self.__temp.format(
-            *args
-        ))
+        return self.__temp.format(*args)

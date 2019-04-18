@@ -1,7 +1,7 @@
 """死链检查
 """
 
-from .markdown import MarkdownFinder
+from .markdown import run
 from argparse import ArgumentParser
 
 def getParser():
@@ -24,10 +24,8 @@ def main():
     parser = getParser()
     args = parser.parse_args()
     if args.target == "md":
-        worker = MarkdownFinder(args.path)
+        run(args.path)
     elif args.target == "rst":
         pass
     else:
         print("invalid target")
-
-    worker.run()

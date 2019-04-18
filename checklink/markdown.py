@@ -3,68 +3,132 @@
 
 import re
 from pathlib import Path
+from queue import Queue, Empty
+from threading import Thread
 
 import requests as r
 
 from .re_ import MD_LINK, removeAnchor, HTTP_URL, PATH
 from .formatter_ import MessageFormatter
 
-class MarkdownFinder:
 
-    def __init__(self, root):
-        self._suffix = {".md", ".MD", ".markdown"}
-        self._formatter = MessageFormatter("{}:{} {}")
-        self._pattern = MD_LINK
-        self._root = Path(root).absolute()
+DIR_QUEUE = Queue(1024)     # Path
+FILE_QUEUE = Queue(1024)    # Path
+LINK_QUEUE = Queue(1024)    # (url: str, file: Path, line: int)
+MSG_QUEUE = Queue(1024)     # str
 
-    def walk(self, root_dir: Path):
-        crt = Path(root_dir)
-        for file in crt.iterdir():
-            if file.suffix in self._suffix and file.is_file():
-                self.testFile(file)
-            elif file.is_dir():
-                self.walk(file)
+POOL = []
 
-    def testFile(self, path):
-        i = 0
-        with path.open("rt", encoding="utf-8") as file:
-            for line in file.readlines():
-                i += 1
-                match = self._pattern.match(line)
-                if not match is None:
-                    url = match.groupdict()['url']
-                    if not url is None:
-                        self.testLink(match.group("url"), path, i)
-                    else:
-                        self._formatter(path, i, "None")
+_SUFFIX = {".md", ".MD", ".markdown"}
+_FORMATTER = MessageFormatter("{}:{}\t{}")
+_ROOT = Path()
 
-    def testLink(self, link_url, file_path, line_num):
-        if HTTP_URL.match(link_url):   # 网络地址
-            x = HTTP_URL.match(link_url)
-            url = removeAnchor(x)
+RUNNING = {"displayMsg", "walk", "findLinkfromFile", "testLink"}
 
-            try:
-                response = r.get(url)
-            except r.ConnectionError:
-                self._formatter(file_path.absolute(), line_num, link_url)
-                return
 
-            if response.status_code in [403, 404, 408]: # 出问题了
-                self._formatter(file_path.absolute(), line_num, link_url)
-        elif PATH.match(link_url):# 本地路径
-            x = PATH.match(link_url)
-            link_url = x.group('path')
-            if link_url[0] == '/':
-                x = Path(link_url[1:])
-                path = self._root / x
+def init(root):
+    global _ROOT
+    _ROOT = Path(root).absolute()
+
+
+def displayMsg():
+    # 当且仅当 所有消息都发出去 并且 其他线程都停止才中断
+    while ("testLink" in RUNNING) or (not MSG_QUEUE.empty()):
+        msg = MSG_QUEUE.get()
+        print(msg)
+
+    RUNNING.discard("displayMsg")
+    return
+
+def walk():
+    """一次循环就会找遍一个目录下的所有子对象, 如果 DIR_QUEUE 为空, 说明所有目录已被索引,
+    即使有未完的文件, 也在 FILE_QUEUE 中.
+
+    因此, 当 DIR_QUEUE 为空就可以停止此线程了.
+    """
+    while not DIR_QUEUE.empty():
+        if not DIR_QUEUE.empty():
+            crt = DIR_QUEUE.get()
+            for file in crt.iterdir():
+                if file.suffix in _SUFFIX and file.is_file():
+                    FILE_QUEUE.put(file)
+                elif file.is_dir():
+                    DIR_QUEUE.put(file)
+
+    # 所有目录已探索完毕
+    RUNNING.discard("walk")
+    return
+
+
+def findLinkfromFile():
+    """当 walk 仍在 run 时, 说明仍有新的文件可能被加入
+    """
+    while ("walk" in RUNNING) or (not FILE_QUEUE.empty()):
+        if not FILE_QUEUE.empty():
+            file = FILE_QUEUE.get()
+            i = 0
+            with file.open("rt", encoding="utf-8") as f:
+                for line in f.readlines():
+                    i += 1
+                    match = MD_LINK.match(line)
+                    if not match is None:
+                        url = match.groupdict()['url']
+                        if not url is None:
+                            LINK_QUEUE.put((url, file, i))
+                        else:  # 空链接
+                            MSG_QUEUE.put(_FORMATTER(file, i, "None"))
+
+    RUNNING.discard("findLinkfromFile")
+    return
+
+
+def testLink():
+    """当 findLinkfromFile 仍在运行时, 说明仍可能有新的 link 被加入
+    """
+    while ("findLinkfromFile" in RUNNING) or (not LINK_QUEUE.empty()):
+        if not LINK_QUEUE.empty():
+            link, file, line = LINK_QUEUE.get()
+
+            if HTTP_URL.match(link):   # 网络地址
+                x = HTTP_URL.match(link)
+                url = removeAnchor(x)
+
+                try:
+                    response = r.get(url)
+                except r.ConnectionError:
+                    MSG_QUEUE.put(_FORMATTER(file, line, link))
+                    return
+
+                if response.status_code in [403, 404, 408]:  # 出问题了
+                    MSG_QUEUE.put(_FORMATTER(file, line, link))
+            elif PATH.match(link):  # 本地路径
+                x = PATH.match(link)
+                link = x.group('path')
+                if link[0] == '/':
+                    x = Path(link[1:])
+                    path = _ROOT / x
+                else:
+                    x = Path(link)
+                    path = file.parent / x
+                if not path.exists():
+                    MSG_QUEUE.put(_FORMATTER(file, line, link))
             else:
-                x = Path(link_url)
-                path = file_path.parent / x
-            if not path.exists():
-                self._formatter(file_path.absolute(),
-                line_num, link_url)
-        else:
-            self._formatter(file_path.absolute(), line_num, link_url[:20])
+                MSG_QUEUE.put(_FORMATTER(file, line, link[:20]))
 
-    def run(self):
-        self.walk(self._root)
+    RUNNING.discard("testLink")
+    return
+
+
+def run(root):
+    init(root)
+
+    DIR_QUEUE.put(_ROOT)
+
+    POOL.append(Thread(target=walk, name="walk"))
+    POOL.append(Thread(target=findLinkfromFile, name="findlink"))
+    POOL.append(Thread(target=testLink, name="testlink0"))
+    POOL.append(Thread(target=testLink, name="testlink1"))
+    POOL.append(Thread(target=displayMsg, name="display-msg"))
+
+    for tr in POOL:
+        tr.start()
