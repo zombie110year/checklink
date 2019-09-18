@@ -33,3 +33,17 @@ class TestMarkdown:
         assert a.url == "a"
         assert b.url == "b"
         assert c.url == "ak"
+
+    def test_invalid_chars(self):
+        link = self.parser.parse("[](https:// kkkk.com)")[0]
+        assert link.url == "https:// kkkk.com"
+
+    def test_file(self):
+        links = self.parser.parse_file("tests/sample-markdown.md")
+        assert len(links) == 2
+        a, b = links
+        assert a.url == "https://example.com"
+        assert a.path == "tests/sample-markdown.md"
+        assert a.row == 5
+        assert b.url == "./local/static/sample.png"
+        assert b.row == 7
