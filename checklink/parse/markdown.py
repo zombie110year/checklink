@@ -16,7 +16,7 @@ class MarkdownParser(Parser):
             for i in self.findall(line):
                 link = Link(i["url"], path, num + 1, i.span()[0])
                 res.append(link)
-            return res
+        return res
 
     def parse_file(self, path: str) -> List[Link]:
         with open(path, "rt", encoding="utf-8") as file:
