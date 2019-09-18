@@ -6,6 +6,9 @@ Every url item should contain:
 - url
 - location(`filepath:row:column`)
 """
+from abc import abstractmethod
+from typing import List
+
 
 class Link:
     def __init__(self, url: str, path: str, row: int, column: int):
