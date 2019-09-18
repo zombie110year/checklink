@@ -1,6 +1,6 @@
 """MarkdownParser
 """
-from typing import List, Generic
+from typing import List, Generator
 import re
 from . import Link, Parser
 
@@ -23,6 +23,6 @@ class MarkdownParser(Parser):
             text = file.read()
         return self.parse(text, path)
 
-    def findall(self, text: str) -> Generic[re.Match]:
+    def findall(self, text: str) -> Generator[None, None, re.Match]:
         for i in self.PATTERN.finditer(text):
             yield i
