@@ -26,7 +26,8 @@ class TestMarkdown:
         assert link.column == 0
 
     def test_find_links(self):
-        links = self.parser.parse("example.com [a](a), jfkadsi [b](b) kaadf ![ka](ak) ,a.fn.")
+        links = self.parser.parse(
+            "example.com [a](a), jfkadsi [b](b) kaadf ![ka](ak) ,a.fn.")
         assert len(links) == 3
         a, b, c = links
         assert a.url == "a"
