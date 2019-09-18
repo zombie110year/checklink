@@ -47,3 +47,13 @@ class Link:
     @path.setter
     def path(self, other: str):
         self.__path = other
+
+
+class Parser:
+    @abstractmethod
+    def parse(self, text: str) -> List[Link]:
+        pass
+
+    @abstractmethod
+    def parse_file(self, path: str) -> List[Link]:
+        pass
