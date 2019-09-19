@@ -24,5 +24,4 @@ class MarkdownParser(Parser):
         return self.parse(text, path)
 
     def findall(self, text: str) -> Generator[None, None, re.Match]:
-        for i in self.PATTERN.finditer(text):
-            yield i
+        yield from self.PATTERN.finditer(text)
