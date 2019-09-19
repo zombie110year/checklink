@@ -8,8 +8,9 @@ def test_check_http_regex():
     assert pattern.fullmatch("https://zombie110year.top/2019/")
     assert pattern.fullmatch("https://zombie110year.top/#README")
     assert pattern.fullmatch("http://zombie110year.top/2019/#README")
-    assert pattern.fullmatch("www.bilibili.com")
-    assert pattern.fullmatch("www.bilibili.com/video/")
+    # let this become local path
+    assert not pattern.fullmatch("www.bilibili.com")
+    assert not pattern.fullmatch("www.bilibili.com/video/")
     assert not pattern.fullmatch("htp://kjfa.comaq/kda")
     assert not pattern.fullmatch("ttp://kjfa.comaq/kda")
 

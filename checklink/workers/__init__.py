@@ -34,7 +34,15 @@ class MarkdownParseWorker(Thread):
                 break
 
             for i in self.parser.parse_file(str(path)):
-                if HTTPChecker.URL_MATCH.fullmatch(i.url):
-                    self.__http.put(i)
-                elif LocalChecker.URL_MATCH.fullmatch(i.url):
+                class_ = classify(i.url)
+                if class_ == "local":
                     self.__local.put(i)
+                elif class_ == "http":
+                    self.__http.put(i)
+
+
+def classify(url) -> str:
+    if HTTPChecker.URL_MATCH.fullmatch(url):
+        return "http"
+    elif LocalChecker.URL_MATCH.fullmatch(url):
+        return "local"

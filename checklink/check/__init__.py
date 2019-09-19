@@ -42,7 +42,7 @@ class HTTPChecker(Checker):
     """Check http url
     """
     URL_MATCH = re.compile(
-        r"((?P<protocol>https?)://)?(?P<domain>(www.)?([^:/]+))(?P<path>(/[^/#]*)+)?(?P<anchor>#.*)?")
+        r"((?P<protocol>https?)://)(?P<domain>(www.)?([^:/]+))(?P<path>(/[^/#]*)+)?(?P<anchor>#.*)?")
 
     def reachable(self, url: str) -> bool:
         try:
