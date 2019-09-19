@@ -4,11 +4,9 @@ from typing import NewType, Tuple
 
 from ..parse import Link
 
-ResultQueue = NewType("ResultQueue", Queue)
-
 
 class Reporter(Thread):
-    def __init__(self, results: ResultQueue[Link, bool]):
+    def __init__(self, results: "Queue[Link, bool]"):
         super().__init__()
         self.__results = results
 

@@ -1,5 +1,4 @@
-from checklink import main
-# import the entry of your program
+from checklink.cli import cli
 
 if __name__ == "__main__":
-    main()
+    cli()
