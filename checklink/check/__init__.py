@@ -49,8 +49,8 @@ class HTTPChecker(Checker):
 
     def reachable(self, url: str) -> bool:
         try:
-            resp = requests.head(url, timeout=self.TIMEOUT,
-                                 headers=self.HEADERS)
+            resp = requests.get(url, timeout=self.TIMEOUT,
+                                headers=self.HEADERS)
             return resp.status_code // 100 != 4
         except:
             return False
