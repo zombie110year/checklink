@@ -15,15 +15,14 @@ def main(root: str, checkers: int = 32):
     results = Queue()
     dirs.put(Path(root))
 
-    file_iters = [FileIter(dirs, dirs, files) for _ in range(4)]
+    file_iter = FileIter(dirs, dirs, files)
     markdown_parsers = [MarkdownParseWorker(
         files, http_links, local_links) for _ in range(4)]
     http_checkers = [HTTPChecker(http_links, results) for _ in range(checkers)]
     local_checkers = [LocalChecker(local_links, results) for _ in range(1)]
     reporter = CommandLineReporter(results)
 
-    for i in file_iters:
-        i.start()
+    file_iter.start()
     for i in markdown_parsers:
         i.start()
     for i in local_checkers:
@@ -39,5 +38,4 @@ def main(root: str, checkers: int = 32):
         i.join()
     for i in markdown_parsers:
         i.join()
-    for i in file_iters:
-        i.join()
+    file_iter.join()
