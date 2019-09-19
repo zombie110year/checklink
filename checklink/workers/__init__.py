@@ -18,10 +18,11 @@ from ..parse.markdown import MarkdownParser
 
 
 class MarkdownParseWorker(Thread):
-    def __init__(self, files: Queue, links: Queue):
+    def __init__(self, files: Queue, http_links: Queue, local_links: Queue):
         super().__init__()
         self.__files = files
-        self.__links = links
+        self.__http = http_links
+        self.__local = local_links
         self.parser = MarkdownParser()
 
     def run(self):
@@ -32,4 +33,7 @@ class MarkdownParseWorker(Thread):
                 break
 
             for i in self.parser.parse_file(str(path)):
-                self.__links.put(i)
+                if HTTPChecker.URL_MATCH.fullmatch(i.url):
+                    self.__http.put(i)
+                elif LocalChecker.URL_MATCH.fullmatch(i.url):
+                    self.__local.put(i)
