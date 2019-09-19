@@ -59,7 +59,7 @@ class HTTPChecker(Checker):
 class LocalChecker(Checker):
     """Check Local File System"""
     URL_MATCH = re.compile(
-        r"(?<!(?P<protocol>file)(://))(?P<label>[A-Z]:)?(?P<path>(/?[^\\/:*?\"<>\|]+)+)")
+        r"(?!#)(?<!(?P<protocol>file)(://))(?P<label>[A-Z]:)?(?P<path>(/?[^\\/:*?\"<>\|]+)+)")
 
     def reachable(self, url: str) -> bool:
         path = Path(url)

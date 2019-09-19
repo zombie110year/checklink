@@ -23,6 +23,8 @@ def test_check_local_regex():
     assert pattern.fullmatch("./hello/echo.txt")
     assert pattern.fullmatch("C:/Users/zombie110year")
     assert pattern.fullmatch("/home/zombie110year")
+    assert pattern.fullmatch("/other/file#labels")
+    assert not pattern.fullmatch("#anchors")
     assert not pattern.fullmatch("/C:/Users/zombie110year")
     assert not pattern.fullmatch("file:///C:/Users/zombie110year/")
 
