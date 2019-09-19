@@ -41,6 +41,8 @@ class Checker(threading.Thread):
 class HTTPChecker(Checker):
     """Check http url
     """
+    URL_MATCH = re.compile(
+        r"((?P<protocol>https?)://)?(?P<domain>(www.)?([^:/]+))(?P<path>(/[^/]*)+)?(?P<anchor>#.*)?")
 
     def reachable(self, url: str) -> bool:
         try:
@@ -52,6 +54,8 @@ class HTTPChecker(Checker):
 
 class LocalChecker(Checker):
     """Check Local File System"""
+    URL_MATCH = re.compile(
+        r"(?<!(?P<protocol>file)(://))(?P<label>[A-Z]:)?(?P<path>(/?[^\\/:*?\"<>\|]+)+)")
 
     def reachable(self, url: str) -> bool:
         path = Path(url)
