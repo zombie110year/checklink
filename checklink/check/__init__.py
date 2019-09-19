@@ -48,7 +48,9 @@ class HTTPChecker(Checker):
         try:
             resp = requests.head(url, timeout=self.TIMEOUT)
             return resp.status_code // 100 != 4
-        except requests.ConnectionError:
+        except requests.HTTPError:
+            return False
+        except requests.Timeout:
             return False
 
 
