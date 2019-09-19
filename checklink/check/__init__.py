@@ -10,7 +10,7 @@ import requests
 
 class Checker(threading.Thread):
     URL_MATCH = re.compile("")
-    TIMEOUT = 3
+    TIMEOUT = 10
 
     def __init__(self, urls: "Queue[Link]", results: "Queue[Link]"):
         """
