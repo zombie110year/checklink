@@ -33,3 +33,10 @@ def test_http_url_extract():
     assert match["domain"] == "zombie110year.top"
     assert match["path"] == "/2019/"
     assert match["anchor"] == "#README"
+
+
+def test_local_url_extract():
+    pattern = LocalChecker.URL_MATCH
+    match = pattern.fullmatch("C:/Users/zombie110year")
+    assert match["label"] == "C:"
+    assert match["path"] == "/Users/zombie110year"
