@@ -1,4 +1,4 @@
-from .workers import HTTPChecker, LocalChecker, FileIter, MarkdownParseWorker
+from .workers import HTTPChecker, LocalChecker, FileIter, MarkdownParseWorker, CommandLineReporter
 from queue import Queue
 from pathlib import Path
 
@@ -20,6 +20,7 @@ def main(root: str, checkers: int = 32):
         files, http_links, local_links) for _ in range(4)]
     http_checkers = [HTTPChecker(http_links, results) for _ in range(checkers)]
     local_checkers = [LocalChecker(local_links, results) for _ in range(1)]
+    reporter = CommandLineReporter(results)
 
     for i in file_iters:
         i.start()
@@ -29,7 +30,9 @@ def main(root: str, checkers: int = 32):
         i.start()
     for i in http_checkers:
         i.start()
+    reporter.start()
 
+    reporter.join()
     for i in http_checkers:
         i.join()
     for i in local_checkers:

@@ -15,6 +15,7 @@ from ..check import HTTPChecker, LocalChecker
 from ..iter import FileIter, TextIter
 from ..parse import Link
 from ..parse.markdown import MarkdownParser
+from ..report import CommandLineReporter
 
 
 class MarkdownParseWorker(Thread):

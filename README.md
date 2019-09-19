@@ -22,5 +22,5 @@ checklink --target md path
 ## Sequence
 
 ```
-(FileSystem) -> FileIter -> path -> MarkdownParser -> Link -> Checker -> Result -> Output
+(FileSystem) -> FileIter -> path -> MarkdownParser -> Link -> Checker -> (Link, bool) -> Output
 ```
