@@ -43,14 +43,16 @@ class HTTPChecker(Checker):
     """
     URL_MATCH = re.compile(
         r"((?P<protocol>https?)://)(?P<domain>(www.)?([^:/]+))(?P<path>(/[^/#]*)+)?(?P<anchor>#.*)?")
+    HEADERS = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0"
+    }
 
     def reachable(self, url: str) -> bool:
         try:
-            resp = requests.head(url, timeout=self.TIMEOUT)
+            resp = requests.head(url, timeout=self.TIMEOUT,
+                                 headers=self.HEADERS)
             return resp.status_code // 100 != 4
-        except requests.HTTPError:
-            return False
-        except requests.Timeout:
+        except:
             return False
 
 
