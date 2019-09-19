@@ -1,5 +1,6 @@
 from checklink.check import HTTPChecker, LocalChecker
 
+
 def test_check_http_regex():
     pattern = HTTPChecker.URL_MATCH
     assert pattern.fullmatch("https://google.com")
@@ -23,3 +24,12 @@ def test_check_local_regex():
     assert pattern.fullmatch("/home/zombie110year")
     assert not pattern.fullmatch("/C:/Users/zombie110year")
     assert not pattern.fullmatch("file:///C:/Users/zombie110year/")
+
+
+def test_http_url_extract():
+    pattern = HTTPChecker.URL_MATCH
+    match = pattern.fullmatch("https://zombie110year.top/2019/#README")
+    assert match["protocol"] == "https"
+    assert match["domain"] == "zombie110year.top"
+    assert match["path"] == "/2019/"
+    assert match["anchor"] == "#README"
