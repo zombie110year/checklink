@@ -28,4 +28,4 @@ class CommandLineReporter(Reporter):
                 pass
             else:
                 string = f"\x1b[31m{link.location} {link.url}\x1b[0m"
-            print(string)
+                print(string)
