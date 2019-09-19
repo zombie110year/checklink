@@ -25,11 +25,12 @@ class Iter(Thread):
 
 
 class FileIter(Iter):
-    def __init__(self, get: Queue, put_dir: Queue, put_file: Queue):
+    def __init__(self, get: Queue, put_dir: Queue, put_file: Queue, glob="*.md"):
         Thread.__init__(self)
         self.__get = get
         self.__put_dir = put_dir
         self.__put_file = put_file
+        self.__glob = glob
 
     def run(self):
         while True:
@@ -45,7 +46,7 @@ class FileIter(Iter):
                     self.__put_dir.put(i)
 
     def product(self, obj: "directory") -> Generator[None, None, Path]:
-        yield from obj.iterdir()
+        yield from obj.glob(self.__glob)
 
 
 class TextIter(Iter):
