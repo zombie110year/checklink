@@ -6,7 +6,7 @@ from .main import main
 def argparser():
     parser = ArgumentParser("checklink")
     parser.add_argument("root", nargs="?", const=".", default=".")
-    parser.add_argument("-j", dest="checkers", type=int, required=False, default=32)
+    parser.add_argument("-j", dest="checkers", type=int, required=False, default=4)
     return parser
 
 

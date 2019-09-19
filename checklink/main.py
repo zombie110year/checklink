@@ -3,7 +3,7 @@ from queue import Queue
 from pathlib import Path
 
 
-def main(root: str, checkers: int = 32):
+def main(root: str, checkers: int = 4):
     """start main processing
 
     :param int checkers: amount of HTTPCheck, Other Threads hava fix value.
