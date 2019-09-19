@@ -6,6 +6,9 @@ authors = ["zombie110year <zombie110year@outlook.com>"]
 packages = [
     {include="checklink"}
 ]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/zombie110year/checklink"
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -21,3 +24,6 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+checklink = 'checklink.cli:cli'
