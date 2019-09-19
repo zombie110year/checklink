@@ -24,7 +24,8 @@ class CommandLineReporter(Reporter):
             except Empty:
                 break
             if reachable:
-                string = f"\x1b[32m{link.location} {link.url}\x1b[0m"
+                # string = f"\x1b[32m{link.location} {link.url}\x1b[0m"
+                pass
             else:
                 string = f"\x1b[31m{link.location} {link.url}\x1b[0m"
             print(string)
